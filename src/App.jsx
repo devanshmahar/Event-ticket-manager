@@ -415,7 +415,7 @@ export default function App() {
                 <form onSubmit={handleBooking}>
                   <div className="field">
                     <label>Full Name *</label>
-                    <input name="name" value={form.name} onChange={handleForm} placeholder="e.g. Devansh mahar" required />
+                    <input name="name" value={form.name} onChange={handleForm} placeholder="e.g. " required />
                   </div>
                   <div className="field">
                     <label>Phone Number *</label>
