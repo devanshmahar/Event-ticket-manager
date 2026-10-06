@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+const INSTAGRAM_PROFILE = 'https://www.instagram.com/co.avevents/';
+
 // ─── EVENT CONFIG ───────────────────────────────────────────────────────────
 const EVENT = {
   name: 'Rain Affair',
@@ -18,6 +20,47 @@ const EVENT = {
   phoneDisplay: '+91 8272834909',
   upiId: '9997210909@ptyes',
   dressCode: 'Smart Pool Wear / Summer Casuals',
+};
+
+const NAVRANG_EVENT = {
+  name: 'Navrang Dandiya Night',
+  brand: 'AV Events & Co.',
+  tagline: 'GARBA • DANDIYA • FESTIVE NIGHT',
+  description: 'Celebrate Navrang Dandiya Night with an evening of festive music, dance, and community at The Sheela’s Farm in Dehradun.',
+  date: '9 October 2026',
+  day: 'Friday',
+  time: '5:00 PM – 10:00 PM',
+  venue: 'The Sheela’s Farm',
+  address: 'Nanda Ki Chowki, Prem Nagar, Dehradun',
+  dj: 'DJ Adi',
+  djInstagram: 'https://www.instagram.com/djadi.in/',
+  giftingPartner: 'Xoxo Patisserie',
+  giftingPartnerInstagram: 'https://www.instagram.com/xoxo_patisserie/',
+  bookMyShowUrl: 'https://in.bookmyshow.com/activities/navrang/ET00518074',
+  sortMySceneUrl: 'https://sortmyscene.com/event/navrang-dandiya-night-oct-09-2026',
+  pickupUrl: 'https://maps.app.goo.gl/vjEXURYW5Zsi5LYm7?g_st=ic',
+  whatsappNumber: '916396930467',
+  passes: [
+    { id: 'female', name: 'Female Pass', price: 249, icon: '💃' },
+    { id: 'male', name: 'Male Pass', price: 349, icon: '🕺' },
+    { id: 'couple', name: 'Couple Pass', price: 499, icon: '🪔' },
+  ],
+  menuSections: [
+    { title: 'Cafe Favourites', icon: '🧇', items: ['Waffle', 'Pancake', 'Beverages', 'Sandwich'] },
+    { title: 'Pizza & Pasta', icon: '🍕', items: ['Pizza', 'Pasta'] },
+    { title: 'Street Food & Snacks', icon: '🍽️', items: ['Dahi Kebab', 'Burger', 'Pav Bhaji', 'Vada Pav', 'Sev Puri', 'Bhel Puri', 'Chilli Potato'] },
+    { title: 'Hot Food', icon: '🍗', items: ['Chicken Momo', 'Kebab', 'Smokey Chicken', 'Chowmein', 'Chilli Chicken', 'Fried Chicken'] },
+  ],
+  benefits: [
+    { icon: '🎧', title: 'Concert DJ Vibe', detail: 'Dance to the beats of DJ Adi', linkText: '@djadi.in', link: 'https://www.instagram.com/djadi.in/' },
+    { icon: '📍', title: 'Prime Venue', detail: 'The Sheela’s Farm, Nanda Ki Chowki, Prem Nagar, Dehradun' },
+    { icon: '🍴', title: 'Famous Food Stalls', detail: 'Taste the best local food brands' },
+    { icon: '🎁', title: '100+ Giveaways', detail: 'Massive gifts by our official gifting partner Xoxo Patisserie', linkText: '@xoxo_patisserie', link: 'https://www.instagram.com/xoxo_patisserie/' },
+    { icon: '🎯', title: 'Fun Games', detail: 'Non-stop entertainment and activities' },
+    { icon: '📸', title: 'Event Photos & Videos', detail: 'See our event coverage, photos, and videos on Instagram', linkText: '@co.avevents', link: INSTAGRAM_PROFILE },
+    { icon: '✨', title: '40+ Influencers', detail: 'Vibe with top creators' },
+    { icon: '🛡️', title: 'Top Security', detail: '100% safety with 20+ bouncers' },
+  ],
 };
 
 
@@ -151,6 +194,12 @@ const HIGHLIGHTS = [
 // ─── MAIN APP ────────────────────────────────────────────────────────────────
 export default function App() {
   const [tab, setTab] = useState('home');
+  const [activeEvent, setActiveEvent] = useState('navrang');
+  const [selectedNavrangPass, setSelectedNavrangPass] = useState('female');
+  const [navrangQuantity, setNavrangQuantity] = useState(1);
+  const [navrangForm, setNavrangForm] = useState({ name: '', phone: '', email: '' });
+  const [navrangBookingOpen, setNavrangBookingOpen] = useState(false);
+  const [navrangBookingMethod, setNavrangBookingMethod] = useState('WhatsApp direct');
   const [menuCat, setMenuCat] = useState('All');
   const [selectedTicket, setSelectedTicket] = useState('gold');
   const [qty, setQty] = useState(1);
@@ -164,11 +213,17 @@ export default function App() {
 
   // ── Countdown timer ──
   useEffect(() => {
-    const target = new Date('2026-07-18T17:00:00+05:30');
+    const target = new Date(activeEvent === 'navrang'
+      ? '2026-10-09T17:00:00+05:30'
+      : '2026-07-18T17:00:00+05:30');
     const interval = setInterval(() => {
       const now = new Date();
       const diff = target - now;
-      if (diff <= 0) { clearInterval(interval); return; }
+      if (diff <= 0) {
+        clearInterval(interval);
+        setCountdown({ days: 0, hours: 0, mins: 0, secs: 0 });
+        return;
+      }
       const days = Math.floor(diff / 86400000);
       const hours = Math.floor((diff % 86400000) / 3600000);
       const mins = Math.floor((diff % 3600000) / 60000);
@@ -176,7 +231,23 @@ export default function App() {
       setCountdown({ days, hours, mins, secs });
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [activeEvent]);
+
+  useEffect(() => {
+    if (!navrangBookingOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const closeOnEscape = event => {
+      if (event.key === 'Escape') setNavrangBookingOpen(false);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [navrangBookingOpen]);
 
   const ticket = TICKETS.find(t => t.id === selectedTicket);
   const total = ticket ? ticket.price * qty : 0;
@@ -193,6 +264,37 @@ export default function App() {
 
   const handleForm = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
   const handleCard = e => setCard(p => ({ ...p, [e.target.name]: e.target.value }));
+  const handleNavrangForm = e => setNavrangForm(p => ({ ...p, [e.target.name]: e.target.value }));
+  const openNavrangBooking = (method = 'WhatsApp direct') => {
+    setNavrangBookingMethod(method);
+    setNavrangBookingOpen(true);
+  };
+
+  const handleNavrangWhatsAppBooking = e => {
+    e.preventDefault();
+    const pass = NAVRANG_EVENT.passes.find(item => item.id === selectedNavrangPass);
+    if (!pass) return;
+
+    const message = [
+      '🎟️ NAVRANG DANDIYA NIGHT – PASS ENQUIRY',
+      '━━━━━━━━━━━━━━━━━━━━━',
+      `👤 Name: ${navrangForm.name.trim()}`,
+      `📞 Phone: ${navrangForm.phone.trim()}`,
+      `📧 Email: ${navrangForm.email.trim()}`,
+      `🎫 Pass: ${pass.name}`,
+      `🔢 Quantity: ${navrangQuantity}`,
+      `💰 Pass total: ₹${(pass.price * navrangQuantity).toLocaleString('en-IN')}`,
+      `📲 Booking preference: ${navrangBookingMethod}`,
+      '━━━━━━━━━━━━━━━━━━━━━',
+      `📅 Friday, 9 October 2026 | ${NAVRANG_EVENT.time}`,
+      `📍 ${NAVRANG_EVENT.venue}, ${NAVRANG_EVENT.address}`,
+      `BookMyShow: ${NAVRANG_EVENT.bookMyShowUrl}`,
+      `SortMyScene: ${NAVRANG_EVENT.sortMySceneUrl}`,
+      'Please confirm my pass booking. Thank you!',
+    ].join('\n');
+
+    window.location.href = `https://wa.me/${NAVRANG_EVENT.whatsappNumber}?text=${encodeURIComponent(message)}`;
+  };
 
   const handleBooking = async e => {
     e.preventDefault();
@@ -275,31 +377,54 @@ export default function App() {
   ];
 
   return (
-    <div className="root">
+    <div className={`root ${activeEvent === 'navrang' ? 'navrang-theme' : ''}`}>
       {/* ── NAVBAR ── */}
       <nav className="navbar">
         <div className="nav-brand" onClick={() => setTab('home')}>
           <span className="brand-av">AV</span>
           <span className="brand-rest"> EVENTSZ</span>
         </div>
-        <div className={`nav-items ${mobileMenuOpen ? 'open' : ''}`}>
-          {navItems.map(n => (
-            <button
-              key={n.id}
-              className={`nav-btn ${tab === n.id ? 'active' : ''}`}
-              onClick={() => { setTab(n.id); setMobileMenuOpen(false); }}
-            >
-              {n.label}
-            </button>
-          ))}
+        <div className="nav-events" aria-label="Choose an event">
+          <button
+            className={`nav-btn ${activeEvent === 'navrang' ? 'active' : ''}`}
+            aria-pressed={activeEvent === 'navrang'}
+            onClick={() => { setActiveEvent('navrang'); setTab('home'); setMobileMenuOpen(false); }}
+          >
+            🪔 Navrang Dandiya
+          </button>
+          <button
+            className={`nav-btn ${activeEvent === 'rain' ? 'active' : ''}`}
+            aria-pressed={activeEvent === 'rain'}
+            onClick={() => { setActiveEvent('rain'); setTab('home'); setMobileMenuOpen(false); }}
+          >
+            🌊 Past Event: Rain Affair
+          </button>
         </div>
-        <button className="hamburger" onClick={() => setMobileMenuOpen(p => !p)}>
-          {mobileMenuOpen ? '✕' : '☰'}
-        </button>
+        <a className="instagram-nav-link" href={INSTAGRAM_PROFILE} target="_blank" rel="noreferrer" aria-label="Follow AV Events on Instagram">
+          <span aria-hidden="true">◎</span> Instagram
+        </a>
+        {activeEvent === 'rain' && (
+          <>
+            <div className={`nav-items ${mobileMenuOpen ? 'open' : ''}`}>
+              {navItems.map(n => (
+                <button
+                  key={n.id}
+                  className={`nav-btn ${tab === n.id ? 'active' : ''}`}
+                  onClick={() => { setTab(n.id); setMobileMenuOpen(false); }}
+                >
+                  {n.label}
+                </button>
+              ))}
+            </div>
+            <button className="hamburger" onClick={() => setMobileMenuOpen(p => !p)}>
+              {mobileMenuOpen ? '✕' : '☰'}
+            </button>
+          </>
+        )}
       </nav>
 
       {/* ── HOME ── */}
-      {tab === 'home' && (
+      {tab === 'home' && activeEvent === 'rain' && (
         <main className="page fade-in">
           {/* Hero */}
           <section className="hero">
@@ -308,7 +433,7 @@ export default function App() {
               <img src="/flyer_pricing.jpg" alt="Ticket Pricing" className="poster poster-sub" />
             </div>
             <div className="hero-content">
-              <span className="pill">EXCLUSIVE LUXURY EXPERIENCE</span>
+              <span className="pill">PAST SUCCESSFUL EVENT</span>
               <h1 className="hero-title shine">RAIN AFFAIR</h1>
               <p className="hero-sub">{EVENT.tagline}</p>
 
@@ -372,8 +497,226 @@ export default function App() {
         </main>
       )}
 
+      {tab === 'home' && activeEvent === 'navrang' && (
+        <main className="page fade-in">
+          <section className="countdown-section navrang-countdown-top">
+            <p className="countdown-label">EVENT STARTS IN</p>
+            <div className="countdown-grid">
+              {[
+                { val: countdown.days, label: 'Days' },
+                { val: countdown.hours, label: 'Hours' },
+                { val: countdown.mins, label: 'Minutes' },
+                { val: countdown.secs, label: 'Seconds' },
+              ].map(c => (
+                <div key={c.label} className="countdown-box">
+                  <span className="countdown-val">{String(c.val).padStart(2, '0')}</span>
+                  <span className="countdown-unit">{c.label}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="hero navrang-hero">
+            <img
+              className="navrang-art"
+              src="/navrang-poster.png"
+              alt="Navrang 2026 Dandiya Night poster featuring DJ Adi"
+            />
+
+            <div className="hero-content">
+              <span className="pill">A FESTIVE NIGHT IN DEHRADUN</span>
+              <h1 className="hero-title shine navrang-title">NAVRANG<br />DANDIYA NIGHT</h1>
+              <p className="hero-sub">{NAVRANG_EVENT.tagline}</p>
+
+              <div className="meta-grid navrang-meta-grid">
+                <div className="meta-item">
+                  <span>📅</span>
+                  <div><b>{NAVRANG_EVENT.day}, {NAVRANG_EVENT.date}</b><p>Festivities from {NAVRANG_EVENT.time}</p></div>
+                </div>
+                <div className="meta-item">
+                  <span>📍</span>
+                  <div><b>{NAVRANG_EVENT.venue}</b><p>{NAVRANG_EVENT.address}</p></div>
+                </div>
+              </div>
+
+              <p className="hero-desc">{NAVRANG_EVENT.description}</p>
+              <p className="dress-code">✨ Celebrate Navrang Dandiya Night with AV Events &amp; Co.</p>
+
+              <div className="hero-btns">
+                <button className="btn-gold navrang-cta" type="button" onClick={() => openNavrangBooking()}>
+                  Book Tickets
+                </button>
+                <button className="btn-outline navrang-cta" type="button" onClick={() => openNavrangBooking('BookMyShow')}>
+                  Book Online
+                </button>
+                <button className="btn-outline navrang-cta" type="button" onClick={() => openNavrangBooking('Physical pass pickup')}>
+                  Get Physical Passes
+                </button>
+                <a className="btn-outline navrang-cta" href="#navrang-menu">
+                  View Menu
+                </a>
+              </div>
+              <p className="navrang-fee-note">Online booking on BookMyShow includes an extra platform fee. Physical passes are available at the same ticket price with no platform fee.</p>
+            </div>
+          </section>
+
+          <section className="navrang-benefits" aria-labelledby="navrang-benefits-title">
+            <h2 className="section-title" id="navrang-benefits-title">What You Get: Event Benefits &amp; Highlights</h2>
+            <div className="navrang-benefit-grid">
+              {NAVRANG_EVENT.benefits.map(benefit => (
+                <article className="navrang-benefit-card" key={benefit.title}>
+                  <span className="navrang-benefit-icon" aria-hidden="true">{benefit.icon}</span>
+                  <div>
+                    <h3>{benefit.title}</h3>
+                    <p>{benefit.detail}</p>
+                    {benefit.link && (
+                      <a href={benefit.link} target="_blank" rel="noreferrer">{benefit.linkText} ↗</a>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="navrang-menu" id="navrang-menu" aria-labelledby="navrang-menu-title">
+            <h2 className="section-title" id="navrang-menu-title">Event Menu</h2>
+            <p className="navrang-menu-intro">Explore the food and drink options available at Navrang Dandiya Night.</p>
+            <div className="navrang-menu-grid">
+              {NAVRANG_EVENT.menuSections.map(section => (
+                <article className="navrang-menu-card" key={section.title}>
+                  <div className="navrang-menu-heading">
+                    <span aria-hidden="true">{section.icon}</span>
+                    <h3>{section.title}</h3>
+                  </div>
+                  <ul>
+                    {section.items.map(item => <li key={item}>{item}</li>)}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="ticket-strip navrang-ticket-strip" id="passes">
+            <h2 className="section-title">Choose Your Pass</h2>
+            <div className="strip-grid navrang-pass-grid">
+              {NAVRANG_EVENT.passes.map(pass => (
+                <article
+                  key={pass.id}
+                  className={`strip-card navrang-pass-card ${selectedNavrangPass === pass.id ? 'selected' : ''}`}
+                  aria-label={`${pass.name}, ₹${pass.price}`}
+                >
+                  <span className="navrang-pass-icon" aria-hidden="true">{pass.icon}</span>
+                  <div className="strip-name">{pass.name}</div>
+                  <div className="strip-price">₹{pass.price.toLocaleString('en-IN')}</div>
+                  <button
+                    className="btn-gold-sm"
+                    type="button"
+                    aria-pressed={selectedNavrangPass === pass.id}
+                    onClick={() => {
+                      setSelectedNavrangPass(pass.id);
+                      openNavrangBooking();
+                    }}
+                  >
+                    {selectedNavrangPass === pass.id ? 'Book This Pass' : 'Select Pass'}
+                  </button>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="navrang-pickup glass">
+            <div>
+              <span className="pill">NO PLATFORM FEE</span>
+              <h2>Pick up physical passes</h2>
+              <p>Get your pass at the same ticket price, with no online platform fee. Use the map link for the pickup location.</p>
+            </div>
+            <div className="navrang-pickup-links">
+              <a className="btn-gold" href={NAVRANG_EVENT.pickupUrl} target="_blank" rel="noreferrer">Open Pickup Location</a>
+              <button className="navrang-sort-link navrang-platform-trigger" type="button" onClick={() => openNavrangBooking('SortMyScene')}>Book on SortMyScene ↗</button>
+            </div>
+          </section>
+        </main>
+      )}
+
+      {activeEvent === 'navrang' && navrangBookingOpen && (
+        <div
+          className="navrang-modal-backdrop"
+          onMouseDown={event => {
+            if (event.target === event.currentTarget) setNavrangBookingOpen(false);
+          }}
+        >
+          <section className="navrang-booking-form glass" role="dialog" aria-modal="true" aria-labelledby="navrang-booking-title">
+            <button className="navrang-modal-close" type="button" aria-label="Close ticket booking" onClick={() => setNavrangBookingOpen(false)}>×</button>
+            <h3 id="navrang-booking-title">Navrang Ticket Enquiry</h3>
+            <p className="navrang-form-note">Choose a booking option and pass, then send your details directly to the event team on WhatsApp.</p>
+            <form onSubmit={handleNavrangWhatsAppBooking}>
+              <fieldset className="navrang-platform-options">
+                <legend>Where would you like to book?</legend>
+                {['WhatsApp direct', 'BookMyShow', 'SortMyScene', 'Physical pass pickup'].map(method => (
+                  <label className={`navrang-platform-option ${navrangBookingMethod === method ? 'selected' : ''}`} key={method}>
+                    <input
+                      type="radio"
+                      name="bookingMethod"
+                      value={method}
+                      checked={navrangBookingMethod === method}
+                      onChange={() => setNavrangBookingMethod(method)}
+                    />
+                    <span>{method}</span>
+                  </label>
+                ))}
+              </fieldset>
+              <div className="navrang-modal-pass-grid" role="group" aria-label="Select pass type">
+                {NAVRANG_EVENT.passes.map(pass => (
+                  <button
+                    className={`navrang-modal-pass ${selectedNavrangPass === pass.id ? 'selected' : ''}`}
+                    key={pass.id}
+                    type="button"
+                    aria-pressed={selectedNavrangPass === pass.id}
+                    onClick={() => setSelectedNavrangPass(pass.id)}
+                  >
+                    <span aria-hidden="true">{pass.icon}</span>
+                    <strong>{pass.name}</strong>
+                    <span>₹{pass.price.toLocaleString('en-IN')}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="navrang-form-fields">
+                <div className="field">
+                  <label htmlFor="navrang-name">Full Name *</label>
+                  <input id="navrang-name" name="name" value={navrangForm.name} onChange={handleNavrangForm} autoComplete="name" placeholder="Your name" required autoFocus />
+                </div>
+                <div className="field">
+                  <label htmlFor="navrang-phone">Phone Number *</label>
+                  <input id="navrang-phone" name="phone" type="tel" value={navrangForm.phone} onChange={handleNavrangForm} autoComplete="tel" placeholder="+91 9876543210" required />
+                </div>
+                <div className="field navrang-email-field">
+                  <label htmlFor="navrang-email">Email Address *</label>
+                  <input id="navrang-email" name="email" type="email" value={navrangForm.email} onChange={handleNavrangForm} autoComplete="email" placeholder="you@example.com" required />
+                </div>
+              </div>
+              <div className="navrang-order-summary">
+                <span>{NAVRANG_EVENT.passes.find(pass => pass.id === selectedNavrangPass)?.name} × {navrangQuantity}</span>
+                <strong>₹{((NAVRANG_EVENT.passes.find(pass => pass.id === selectedNavrangPass)?.price || 0) * navrangQuantity).toLocaleString('en-IN')}</strong>
+              </div>
+              <div className="navrang-quantity">
+                <span>Number of passes</span>
+                <div className="qty-row">
+                  <button type="button" className="qty-btn" aria-label="Remove one pass" onClick={() => setNavrangQuantity(quantity => Math.max(1, quantity - 1))}>−</button>
+                  <span className="qty-val" aria-live="polite">{navrangQuantity}</span>
+                  <button type="button" className="qty-btn" aria-label="Add one pass" onClick={() => setNavrangQuantity(quantity => quantity + 1)}>+</button>
+                </div>
+              </div>
+              <button className="btn-whatsapp navrang-whatsapp-button" type="submit">
+                Send Enquiry Directly on WhatsApp
+              </button>
+              <p className="navrang-form-note">WhatsApp opens with your details and booking preference ready. Tap Send there to deliver your enquiry. This website does not store your form details.</p>
+            </form>
+          </section>
+        </div>
+      )}
+
       {/* ── TICKETS ── */}
-      {tab === 'tickets' && (
+      {activeEvent === 'rain' && tab === 'tickets' && (
         <main className="page fade-in">
           <h2 className="page-title">Book Your Experience</h2>
 
@@ -601,7 +944,7 @@ export default function App() {
       )}
 
       {/* ── MENU ── */}
-      {tab === 'menu' && (
+      {activeEvent === 'rain' && tab === 'menu' && (
         <main className="page fade-in">
           <h2 className="page-title">Food &amp; Beverages</h2>
           <p className="page-sub">Curated exclusively for Rain Affair guests &nbsp;•&nbsp; All-inclusive with your pass</p>
@@ -672,7 +1015,7 @@ export default function App() {
 
 
       {/* ── VENUE ── */}
-      {tab === 'venue' && (
+      {activeEvent === 'rain' && tab === 'venue' && (
         <main className="page fade-in">
           <h2 className="page-title">Venue & Location</h2>
           <div className="venue-layout">
@@ -712,14 +1055,26 @@ export default function App() {
         <div className="footer-inner">
           <div>
             <span className="brand-av">AV</span><span className="brand-rest"> EVENTSZ</span>
-            <p>Rain Affair – {EVENT.date}</p>
+            <p>{activeEvent === 'navrang' ? `${NAVRANG_EVENT.name} – ${NAVRANG_EVENT.date}` : `Rain Affair – ${EVENT.date}`}</p>
           </div>
-          <div>
-            <p>📞 <a href={`tel:${EVENT.phone}`} className="gold">{EVENT.phoneDisplay}</a></p>
-            <p>📍 {EVENT.address}</p>
-          </div>
-          <button className="btn-gold-sm" onClick={() => setTab('tickets')}>Book Now</button>
+          {activeEvent === 'rain' ? (
+            <>
+              <div>
+                <p>📞 <a href={`tel:${EVENT.phone}`} className="gold">{EVENT.phoneDisplay}</a></p>
+                <p>📍 {EVENT.address}</p>
+              </div>
+              <button className="btn-gold-sm" onClick={() => setTab('tickets')}>Book Now</button>
+            </>
+          ) : (
+            <>
+              <p>📍 {NAVRANG_EVENT.venue}, {NAVRANG_EVENT.address} &nbsp;•&nbsp; <a href={NAVRANG_EVENT.pickupUrl} target="_blank" rel="noreferrer" className="gold">Physical pass pickup location</a></p>
+              <button className="btn-gold-sm" onClick={() => openNavrangBooking()}>Book Tickets</button>
+            </>
+          )}
         </div>
+        <a className="footer-instagram" href={INSTAGRAM_PROFILE} target="_blank" rel="noreferrer">
+          ◎ Follow <strong>@co.avevents</strong> for event photos, videos &amp; updates
+        </a>
         <p className="footer-copy">© 2026 AV Eventsz. All rights reserved.</p>
       </footer>
     </div>
