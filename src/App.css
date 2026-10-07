@@ -474,6 +474,39 @@ input, button, select { font-family: 'Outfit', sans-serif; }
 .navrang-payment-qr img { display: block; width: 190px; height: 190px; }
 .navrang-payment-qr p { color: #222; font-size: 12px; line-height: 1.5; }
 .navrang-payment-qr > a { color: #5d1c26; }
+.navrang-issued-tickets { display: flex; flex-direction: column; gap: 18px; }
+.navrang-issued-heading { text-align: center; }
+.navrang-issued-heading h4 { margin: 12px 0 6px; color: var(--gold2); font-family: 'Playfair Display', serif; font-size: 24px; }
+.navrang-issued-heading p,
+.navrang-ticket-disclaimer { color: var(--muted); font-size: 12px; line-height: 1.5; text-align: center; }
+.navrang-issued-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.navrang-pass-ticket {
+  overflow: hidden;
+  border: 1px solid rgba(223,186,107,0.65);
+  border-radius: 14px;
+  color: #fff7e6;
+  background: linear-gradient(135deg, #211017, #100f16 58%, #311c10);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.26);
+}
+.navrang-pass-ticket-header { display: flex; justify-content: space-between; padding: 12px 16px; color: #e5c778; background: rgba(0,0,0,0.35); font-size: 10px; font-weight: 900; letter-spacing: 1.4px; }
+.navrang-pass-ticket-body { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 16px; }
+.navrang-pass-ticket-label { color: #e5c778; font-size: 9px; font-weight: 900; letter-spacing: 1.5px; }
+.navrang-pass-ticket h5 { margin: 6px 0 12px; font-family: 'Playfair Display', serif; font-size: 25px; line-height: 1.06; }
+.navrang-pass-ticket-body p { margin: 5px 0 0; color: #e5dbca; font-size: 11px; }
+.navrang-pass-ticket-body .navrang-ticket-holder { color: #fff; font-size: 17px; font-weight: 800; overflow-wrap: anywhere; }
+.navrang-pass-ticket-body img { width: 92px; height: 92px; padding: 5px; border-radius: 6px; background: #fff; }
+.navrang-pass-ticket-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 13px 16px; border-top: 1px dashed rgba(223,186,107,0.55); }
+.navrang-pass-ticket-details span { color: #f1e8d8; font-size: 10px; line-height: 1.4; }
+.navrang-pass-ticket-details span:last-child { grid-column: 1 / -1; }
+.navrang-pass-ticket-details b { display: block; margin-bottom: 2px; color: #d8b861; font-size: 8px; letter-spacing: 1px; }
+.navrang-pass-ticket-code { padding: 9px 16px; color: #d9c9a5; background: rgba(0,0,0,0.28); font-family: monospace; font-size: 10px; letter-spacing: 1px; }
+.navrang-issued-pass-actions { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 14px; }
+.navrang-issued-pass-actions .btn-whatsapp { padding: 11px 14px; font-size: 13px; }
+.navrang-pass-whatsapp-link { color: #e5c778; font-size: 11px; font-weight: 700; text-align: center; text-decoration: none; }
+.navrang-pass-whatsapp-link:hover { text-decoration: underline; }
+.navrang-issued-actions { display: flex; flex-direction: column; gap: 10px; }
+.navrang-issued-actions .btn-outline { text-align: center; text-decoration: none; }
+.navrang-pass-error { padding: 10px 12px; border: 1px solid rgba(248,113,113,0.45); border-radius: 10px; color: #fecaca; font-size: 12px; line-height: 1.45; }
 .navrang-pickup {
   display: flex;
   align-items: center;
@@ -1173,6 +1206,7 @@ input, button, select { font-family: 'Outfit', sans-serif; }
 @media print {
   body * { visibility: hidden; }
   #digital-ticket, #digital-ticket * { visibility: visible; }
+  .navrang-issued-tickets, .navrang-issued-tickets * { visibility: visible; }
   #digital-ticket {
     position: fixed; left: 0; top: 0;
     width: 100%; max-width: 100%;
@@ -1180,5 +1214,18 @@ input, button, select { font-family: 'Outfit', sans-serif; }
     border: 2px solid #000;
     border-radius: 0;
   }
+  .navrang-issued-tickets {
+    position: fixed; left: 0; top: 0; z-index: 9999;
+    display: block; width: 100%; max-height: none; overflow: visible;
+    padding: 0; color: #111; background: #fff;
+  }
+  .navrang-issued-heading, .navrang-ticket-disclaimer, .navrang-issued-actions, .navrang-issued-pass-actions { display: none !important; }
+  .navrang-issued-grid { display: block; }
+  .navrang-pass-ticket {
+    width: 100%; margin: 0 0 12px; border: 2px solid #8f7130;
+    border-radius: 0; box-shadow: none; break-after: page; page-break-after: always;
+    print-color-adjust: exact; -webkit-print-color-adjust: exact;
+  }
+  .navrang-pass-ticket:last-child { break-after: auto; page-break-after: auto; }
   .navbar, .footer, .ticket-actions, .wa-hint { display: none !important; }
 }

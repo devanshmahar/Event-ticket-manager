@@ -68,6 +68,83 @@ const NAVRANG_EVENT = {
   ],
 };
 
+const createNavrangPassImage = (ticket, booking) => new Promise((resolve, reject) => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1200;
+  canvas.height = 600;
+  const context = canvas.getContext('2d');
+  if (!context) {
+    reject(new Error('Canvas is unavailable'));
+    return;
+  }
+
+  const accent = booking.passId === 'female' ? '#ed3e8d' : booking.passId === 'male' ? '#3b82d0' : '#54a848';
+  const qr = new Image();
+  qr.onload = () => {
+    context.fillStyle = '#09080c';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    const background = context.createLinearGradient(0, 0, 900, 600);
+    background.addColorStop(0, '#26121a');
+    background.addColorStop(0.55, '#121018');
+    background.addColorStop(1, '#311c10');
+    context.fillStyle = background;
+    context.fillRect(0, 0, 900, 600);
+    context.strokeStyle = '#c9a65a';
+    context.lineWidth = 5;
+    context.strokeRect(18, 18, 1164, 564);
+
+    context.fillStyle = '#d9b869';
+    context.font = 'bold 27px Arial';
+    context.fillText('AV EVENTS & CO.', 60, 85);
+    context.fillStyle = '#fff3d2';
+    context.font = 'bold 76px Georgia';
+    context.fillText('NAVRANG', 58, 205);
+    context.font = 'bold 43px Georgia';
+    context.fillText('DANDIYA NIGHT', 62, 265);
+    context.fillStyle = '#d6c9aa';
+    context.font = '24px Arial';
+    context.fillText('A FESTIVE NIGHT TO CELEBRATE', 62, 315);
+    context.fillStyle = '#ffffff';
+    context.font = 'bold 34px Arial';
+    context.fillText(booking.name.slice(0, 26), 62, 390);
+    context.fillStyle = '#dfba6b';
+    context.font = 'bold 25px Arial';
+    context.fillText(`${booking.passName} · ₹${booking.price}`, 62, 435);
+    context.fillStyle = '#e9e3d7';
+    context.font = '22px Arial';
+    context.fillText('FRIDAY, 9 OCTOBER 2026 · 5:00 PM – 10:00 PM', 62, 490);
+    context.font = '20px Arial';
+    context.fillText('THE SHEELA’S FARM · DEHRADUN', 62, 528);
+
+    context.fillStyle = accent;
+    context.fillRect(900, 20, 280, 560);
+    context.fillStyle = '#fff';
+    context.textAlign = 'center';
+    context.font = 'bold 31px Arial';
+    context.fillText(booking.passName.toUpperCase(), 1040, 78, 250);
+    context.font = 'bold 54px Georgia';
+    context.fillText(`₹${booking.price}`, 1040, 140);
+    context.fillStyle = '#fff';
+    context.fillRect(970, 170, 140, 140);
+    context.drawImage(qr, 976, 176, 128, 128);
+    context.fillStyle = '#fff';
+    context.font = 'bold 19px Arial';
+    context.fillText('PASS ID QR', 1040, 345);
+    context.font = 'bold 20px monospace';
+    context.fillText(ticket.code, 1040, 390, 250);
+    context.font = '18px Arial';
+    context.fillText(`${ticket.number} OF ${booking.quantity}`, 1040, 435);
+    context.textAlign = 'left';
+
+    canvas.toBlob(blob => {
+      if (blob) resolve(blob);
+      else reject(new Error('Could not render the pass image'));
+    }, 'image/png');
+  };
+  qr.onerror = () => reject(new Error('Could not load the pass QR code'));
+  qr.src = ticket.qrCode;
+});
+
 
 const TICKETS = [
   {
@@ -205,6 +282,9 @@ export default function App() {
   const [navrangForm, setNavrangForm] = useState({ name: '', phone: '', email: '' });
   const [navrangBookingOpen, setNavrangBookingOpen] = useState(false);
   const [navrangBookingMethod, setNavrangBookingMethod] = useState('WhatsApp direct');
+  const [navrangIssuedBooking, setNavrangIssuedBooking] = useState(null);
+  const [navrangPassError, setNavrangPassError] = useState('');
+  const [isIssuingNavrangPass, setIsIssuingNavrangPass] = useState(false);
   const [navrangQr, setNavrangQr] = useState('');
   const [navrangQrError, setNavrangQrError] = useState(false);
   const [menuCat, setMenuCat] = useState('All');
@@ -298,31 +378,108 @@ export default function App() {
     setNavrangBookingOpen(true);
   };
 
-  const handleNavrangWhatsAppBooking = e => {
+  const handleNavrangWhatsAppBooking = async e => {
     e.preventDefault();
     const pass = NAVRANG_EVENT.passes.find(item => item.id === selectedNavrangPass);
     if (!pass) return;
 
-    const total = pass.price * navrangQuantity;
-    const qrImageUrl = new URL('/navrang-upi-qr.png', window.location.origin).href;
-    const message = [
-      '🎟️ NAVRANG DANDIYA NIGHT – PASS ENQUIRY',
-      '━━━━━━━━━━━━━━━━━━━━━',
-      `👤 Name: ${navrangForm.name.trim()}`,
-      `📞 Phone: ${navrangForm.phone.trim()}`,
-      `📧 Email: ${navrangForm.email.trim()}`,
-      `🎫 Pass: ${pass.name}`,
-      `🔢 Quantity: ${navrangQuantity}`,
-      `💰 Pass total: ₹${total.toLocaleString('en-IN')}`,
-      '━━━━━━━━━━━━━━━━━━━━━',
-      `📅 Friday, 9 October 2026 | ${NAVRANG_EVENT.time}`,
-      `📍 ${NAVRANG_EVENT.venue}, ${NAVRANG_EVENT.address}`,
-      `💳 UPI ID: ${NAVRANG_EVENT.upiId}`,
-      `🧾 Payment QR for ₹${total.toLocaleString('en-IN')}: ${qrImageUrl}`,
-      'Please confirm my pass booking. Thank you!',
-    ].join('\n');
+    setIsIssuingNavrangPass(true);
+    setNavrangPassError('');
+    try {
+      const name = navrangForm.name.trim();
+      const phone = navrangForm.phone.trim();
+      const email = navrangForm.email.trim();
+      const total = pass.price * navrangQuantity;
+      const whatsappNumber = phone.replace(/\D/g, '');
+      const recipientNumber = whatsappNumber.length === 10 ? `91${whatsappNumber}` : whatsappNumber;
+      const tickets = await Promise.all(Array.from({ length: navrangQuantity }, async (_, index) => {
+        const code = `NAV-${crypto.randomUUID().slice(0, 12).toUpperCase()}`;
+        const qrCode = await QRCode.toDataURL(`NAVRANG:${code}`, { width: 180, margin: 1 });
+        const ticket = { code, qrCode, number: index + 1 };
+        const imageBlob = await createNavrangPassImage(ticket, {
+          name,
+          passId: pass.id,
+          passName: pass.name,
+          price: pass.price,
+          quantity: navrangQuantity,
+        });
+        const shareMessage = [
+          `🎟️ Your Navrang Dandiya Night ${pass.name}`,
+          `Name: ${name}`,
+          `Pass ID: ${code}`,
+          `Friday, 9 October 2026 | ${NAVRANG_EVENT.time}`,
+          `${NAVRANG_EVENT.venue}, ${NAVRANG_EVENT.address}`,
+          'Please keep your payment confirmation for entry.',
+        ].join('\n');
+        return {
+          ...ticket,
+          imageBlob,
+          whatsappUrl: `https://wa.me/${recipientNumber}?text=${encodeURIComponent(shareMessage)}`,
+        };
+      }));
+      const qrImageUrl = new URL('/navrang-upi-qr.png', window.location.origin).href;
+      const message = [
+        '🎟️ NAVRANG DANDIYA NIGHT – BOOKING',
+        '━━━━━━━━━━━━━━━━━━━━━',
+        `👤 Name: ${name}`,
+        `📞 Phone: ${phone}`,
+        `📧 Email: ${email}`,
+        `🎫 Pass: ${pass.name}`,
+        `🔢 Quantity: ${navrangQuantity}`,
+        `💰 Pass total: ₹${total.toLocaleString('en-IN')}`,
+        `🪪 Pass IDs: ${tickets.map(ticket => ticket.code).join(', ')}`,
+        '━━━━━━━━━━━━━━━━━━━━━',
+        `📅 Friday, 9 October 2026 | ${NAVRANG_EVENT.time}`,
+        `📍 ${NAVRANG_EVENT.venue}, ${NAVRANG_EVENT.address}`,
+        `💳 UPI ID: ${NAVRANG_EVENT.upiId}`,
+        `🧾 Payment QR: ${qrImageUrl}`,
+        'Please confirm my payment and booking. Thank you!',
+      ].join('\n');
 
-    window.location.href = `https://wa.me/${NAVRANG_EVENT.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      setNavrangIssuedBooking({
+        name,
+        phone,
+        email,
+        passName: pass.name,
+        passId: pass.id,
+        price: pass.price,
+        quantity: navrangQuantity,
+        total,
+        tickets,
+        whatsappUrl: `https://wa.me/${NAVRANG_EVENT.whatsappNumber}?text=${encodeURIComponent(message)}`,
+      });
+    } catch (error) {
+      console.error('Failed to issue Navrang passes', error);
+      setNavrangPassError('We could not create your passes. Please try again.');
+    } finally {
+      setIsIssuingNavrangPass(false);
+    }
+  };
+
+  const shareNavrangPass = async ticket => {
+    try {
+      const file = new File([ticket.imageBlob], `${ticket.code}.png`, { type: 'image/png' });
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Navrang Dandiya Night Pass',
+          text: `Navrang Dandiya Night pass for ${navrangIssuedBooking.name} · ${ticket.code}`,
+        });
+        return;
+      }
+
+      const downloadUrl = URL.createObjectURL(file);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = downloadUrl;
+      downloadLink.download = file.name;
+      downloadLink.click();
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+      setNavrangPassError('Pass image downloaded. Open its WhatsApp link below and attach the image to send it.');
+    } catch (error) {
+      if (error.name === 'AbortError') return;
+      console.error('Failed to share Navrang pass', error);
+      setNavrangPassError('Could not share this pass. Use Download / Print Passes instead.');
+    }
   };
 
   const handleBooking = async e => {
@@ -719,9 +876,11 @@ export default function App() {
         >
           <section className="navrang-booking-form glass" role="dialog" aria-modal="true" aria-labelledby="navrang-booking-title">
             <button className="navrang-modal-close" type="button" aria-label="Close ticket booking" onClick={() => setNavrangBookingOpen(false)}>×</button>
-            <h3 id="navrang-booking-title">Navrang Ticket Enquiry</h3>
-            <p className="navrang-form-note">Choose a booking option and pass, then send your details directly to the event team on WhatsApp.</p>
-            <form onSubmit={handleNavrangWhatsAppBooking}>
+            <h3 id="navrang-booking-title">{navrangIssuedBooking ? 'Your Navrang Pass' : 'Navrang Ticket Enquiry'}</h3>
+            {!navrangIssuedBooking ? (
+              <>
+                <p className="navrang-form-note">Choose your pass and enter your details. Your named digital pass will be created immediately after you submit.</p>
+                <form onSubmit={handleNavrangWhatsAppBooking}>
               <fieldset className="navrang-platform-options">
                 <legend>Where would you like to book?</legend>
                 {[
@@ -798,11 +957,71 @@ export default function App() {
                   <button type="button" className="qty-btn" aria-label="Add one pass" onClick={() => setNavrangQuantity(quantity => quantity + 1)}>+</button>
                 </div>
               </div>
-              <button className="btn-whatsapp navrang-whatsapp-button" type="submit">
-                Send Enquiry Directly on WhatsApp
-              </button>
-              <p className="navrang-form-note">WhatsApp opens with your details and booking preference ready. Tap Send there to deliver your enquiry. This website does not store your form details.</p>
-            </form>
+                  {navrangPassError && <p className="navrang-pass-error" role="alert">{navrangPassError}</p>}
+                  <button className="btn-gold navrang-whatsapp-button" type="submit" disabled={isIssuingNavrangPass}>
+                    {isIssuingNavrangPass ? 'Creating Your Passes…' : 'Generate My Named Pass'}
+                  </button>
+                  <p className="navrang-form-note navrang-payment-disclaimer">Passes are generated when this form is submitted. Payment is not verified by this form; keep your payment confirmation available.</p>
+                </form>
+              </>
+            ) : (
+              <div className="navrang-issued-tickets">
+                <div className="navrang-issued-heading">
+                  <span className="pill">PASS CREATED</span>
+                  <h4>Your Navrang pass{navrangIssuedBooking.quantity > 1 ? 'es are' : ' is'} ready, {navrangIssuedBooking.name}!</h4>
+                  <p>Save or print each pass and keep your payment confirmation available at entry.</p>
+                </div>
+                {navrangPassError && <p className="navrang-pass-error" role="status">{navrangPassError}</p>}
+                <div className="navrang-issued-grid">
+                  {navrangIssuedBooking.tickets.map(ticket => (
+                    <article className="navrang-pass-ticket" key={ticket.code}>
+                      <header className="navrang-pass-ticket-header">
+                        <span>AV EVENTS &amp; CO.</span>
+                        <span>NAVRANG 2026</span>
+                      </header>
+                      <div className="navrang-pass-ticket-body">
+                        <div>
+                          <span className="navrang-pass-ticket-label">ADMIT PASS {navrangIssuedBooking.quantity > 1 ? `${ticket.number} OF ${navrangIssuedBooking.quantity}` : ''}</span>
+                          <h5>Navrang<br />Dandiya Night</h5>
+                          <p className="navrang-ticket-holder">{navrangIssuedBooking.name}</p>
+                          <p>{navrangIssuedBooking.passName} · ₹{navrangIssuedBooking.price.toLocaleString('en-IN')}</p>
+                        </div>
+                        <img src={ticket.qrCode} alt={`Pass ID QR for ${ticket.code}; organizer checks manually`} />
+                      </div>
+                      <div className="navrang-pass-ticket-details">
+                        <span><b>DATE</b>Friday, 9 October 2026</span>
+                        <span><b>TIME</b>{NAVRANG_EVENT.time}</span>
+                        <span><b>VENUE</b>{NAVRANG_EVENT.venue}, {NAVRANG_EVENT.address}</span>
+                      </div>
+                      <footer className="navrang-pass-ticket-code">PASS ID: {ticket.code}</footer>
+                      <div className="navrang-issued-pass-actions">
+                        <button className="btn-whatsapp navrang-whatsapp-button" type="button" onClick={() => shareNavrangPass(ticket)}>
+                          Share This Pass on WhatsApp
+                        </button>
+                        <a className="navrang-pass-whatsapp-link" href={ticket.whatsappUrl} target="_blank" rel="noreferrer">
+                          Open WhatsApp for {navrangIssuedBooking.name} ↗
+                        </a>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <p className="navrang-ticket-disclaimer">This form creates a pass and unique ID in this browser only; it does not record or validate bookings or verify payment. Keep your UPI payment confirmation and have the event team check the pass manually.</p>
+                <p className="navrang-ticket-disclaimer">To send the ticket image, tap Share This Pass on WhatsApp, choose WhatsApp and the recipient, then confirm Send. Some browsers will download the image so you can attach it in WhatsApp.</p>
+                <div className="navrang-issued-actions">
+                  <button className="btn-gold" type="button" onClick={printTicket}>Download / Print Pass{navrangIssuedBooking.quantity > 1 ? 'es' : ''}</button>
+                  <a className="btn-outline navrang-cta" href={navrangIssuedBooking.whatsappUrl} target="_blank" rel="noreferrer">
+                    Send Booking Details to Event Team
+                  </a>
+                  <button className="btn-outline" type="button" onClick={() => {
+                    setNavrangIssuedBooking(null);
+                    setNavrangForm({ name: '', phone: '', email: '' });
+                    setNavrangQuantity(1);
+                  }}>
+                    Book Another Pass
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
         </div>
       )}
