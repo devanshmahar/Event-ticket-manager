@@ -71,7 +71,7 @@ const NAVRANG_EVENT = {
 const createNavrangPassImage = (ticket, booking) => new Promise((resolve, reject) => {
   const canvas = document.createElement('canvas');
   canvas.width = 1200;
-  canvas.height = 600;
+  canvas.height = 460;
   const context = canvas.getContext('2d');
   if (!context) {
     reject(new Error('Canvas is unavailable'));
@@ -80,60 +80,89 @@ const createNavrangPassImage = (ticket, booking) => new Promise((resolve, reject
 
   const accent = booking.passId === 'female' ? '#ed3e8d' : booking.passId === 'male' ? '#3b82d0' : '#54a848';
   const qr = new Image();
-  qr.onload = () => {
-    context.fillStyle = '#09080c';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    const background = context.createLinearGradient(0, 0, 900, 600);
-    background.addColorStop(0, '#26121a');
-    background.addColorStop(0.55, '#121018');
-    background.addColorStop(1, '#311c10');
-    context.fillStyle = background;
-    context.fillRect(0, 0, 900, 600);
-    context.strokeStyle = '#c9a65a';
-    context.lineWidth = 5;
-    context.strokeRect(18, 18, 1164, 564);
+  const poster = new Image();
+  const render = () => {
+    if (!qr.complete || !qr.naturalWidth || !poster.complete || !poster.naturalWidth) return;
 
-    context.fillStyle = '#d9b869';
-    context.font = 'bold 27px Arial';
-    context.fillText('AV EVENTS & CO.', 60, 85);
-    context.fillStyle = '#fff3d2';
-    context.font = 'bold 76px Georgia';
-    context.fillText('NAVRANG', 58, 205);
-    context.font = 'bold 43px Georgia';
-    context.fillText('DANDIYA NIGHT', 62, 265);
-    context.fillStyle = '#d6c9aa';
-    context.font = '24px Arial';
-    context.fillText('A FESTIVE NIGHT TO CELEBRATE', 62, 315);
-    context.fillStyle = '#ffffff';
-    context.font = 'bold 34px Arial';
-    context.fillText(booking.name.slice(0, 26), 62, 390);
-    context.fillStyle = '#dfba6b';
-    context.font = 'bold 25px Arial';
-    context.fillText(`${booking.passName} · ₹${booking.price}`, 62, 435);
-    context.fillStyle = '#e9e3d7';
-    context.font = '22px Arial';
-    context.fillText('FRIDAY, 9 OCTOBER 2026 · 5:00 PM – 10:00 PM', 62, 490);
-    context.font = '20px Arial';
-    context.fillText('THE SHEELA’S FARM · DEHRADUN', 62, 528);
+    const mainWidth = 900;
+    const sourceHeight = poster.naturalWidth * canvas.height / mainWidth;
+    const sourceY = Math.max(0, Math.min(poster.naturalHeight - sourceHeight, poster.naturalHeight * 0.17));
+    context.fillStyle = '#130c0b';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(poster, 0, sourceY, poster.naturalWidth, sourceHeight, 0, 0, mainWidth, canvas.height);
+    context.fillStyle = 'rgba(12, 5, 6, 0.28)';
+    context.fillRect(0, 0, mainWidth, canvas.height);
+    const textShade = context.createLinearGradient(0, 0, mainWidth, 0);
+    textShade.addColorStop(0, 'rgba(12, 5, 6, 0.7)');
+    textShade.addColorStop(0.55, 'rgba(12, 5, 6, 0.28)');
+    textShade.addColorStop(1, 'rgba(12, 5, 6, 0.06)');
+    context.fillStyle = textShade;
+    context.fillRect(0, 0, mainWidth, canvas.height);
+
+    context.fillStyle = '#f4d477';
+    context.font = 'bold 21px Arial';
+    context.fillText('AV EVENTS & CO.  ·  NAVRANG 2026', 38, 43);
+    context.textAlign = 'center';
+    context.fillStyle = '#fff';
+    context.shadowColor = 'rgba(0, 0, 0, 0.8)';
+    context.shadowBlur = 12;
+    context.font = 'bold 32px Georgia';
+    context.fillText(booking.name.slice(0, 28).toUpperCase(), 450, 336, 780);
+    context.shadowBlur = 0;
+    context.fillStyle = '#ffe19a';
+    context.font = 'bold 18px Arial';
+    context.fillText(`${booking.passName.toUpperCase()}  ·  PASS ${ticket.number} OF ${booking.quantity}`, 450, 370, 780);
+    context.fillStyle = '#fff';
+    context.font = 'bold 16px Arial';
+    context.fillText('FRIDAY, 9 OCTOBER 2026  ·  5:00 PM – 10:00 PM', 450, 412, 820);
+    context.font = '15px Arial';
+    context.fillText('THE SHEELA’S FARM  ·  DEHRADUN', 450, 438, 820);
+    context.textAlign = 'left';
 
     context.fillStyle = accent;
-    context.fillRect(900, 20, 280, 560);
+    context.fillRect(mainWidth, 0, 300, canvas.height);
+    context.strokeStyle = '#f5dda0';
+    context.lineWidth = 5;
+    context.strokeRect(7, 7, 1186, 446);
+    context.setLineDash([8, 8]);
+    context.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+    context.beginPath();
+    context.moveTo(mainWidth, 12);
+    context.lineTo(mainWidth, canvas.height - 12);
+    context.stroke();
+    context.setLineDash([]);
+
     context.fillStyle = '#fff';
     context.textAlign = 'center';
-    context.font = 'bold 31px Arial';
-    context.fillText(booking.passName.toUpperCase(), 1040, 78, 250);
-    context.font = 'bold 54px Georgia';
-    context.fillText(`₹${booking.price}`, 1040, 140);
+    context.font = 'bold 25px Arial';
+    context.fillText(booking.passName.toUpperCase(), 1050, 49, 270);
+    context.font = 'bold 52px Georgia';
+    context.fillText(`₹${booking.price}`, 1050, 112);
+    context.font = 'bold 12px Arial';
+    context.fillText('DRESS UP  ·  DANCE  ·  CELEBRATE', 1050, 139, 270);
     context.fillStyle = '#fff';
-    context.fillRect(970, 170, 140, 140);
-    context.drawImage(qr, 976, 176, 128, 128);
+    context.fillRect(1000, 158, 100, 100);
+    context.drawImage(qr, 1005, 163, 90, 90);
     context.fillStyle = '#fff';
-    context.font = 'bold 19px Arial';
-    context.fillText('PASS ID QR', 1040, 345);
-    context.font = 'bold 20px monospace';
-    context.fillText(ticket.code, 1040, 390, 250);
-    context.font = '18px Arial';
-    context.fillText(`${ticket.number} OF ${booking.quantity}`, 1040, 435);
+    context.font = 'bold 13px Arial';
+    context.fillText('PASS ID QR', 1050, 278);
+    context.font = 'bold 15px monospace';
+    context.fillText(ticket.code, 1050, 303, 280);
+
+    let barcodeX = 930;
+    const barcodeY = 330;
+    const barcodeHeight = 48;
+    context.fillStyle = '#fff';
+    context.fillRect(925, barcodeY - 7, 250, 67);
+    context.fillStyle = '#111';
+    const barcodeBits = `101${Array.from(ticket.code).map(character => character.charCodeAt(0).toString(2).padStart(8, '0')).join('')}101`;
+    for (const bit of barcodeBits) {
+      if (bit === '1') context.fillRect(barcodeX, barcodeY, 2, barcodeHeight);
+      barcodeX += 2;
+    }
+    context.font = '13px Arial';
+    context.fillStyle = '#fff';
+    context.fillText(`${ticket.number} OF ${booking.quantity}`, 1050, 416);
     context.textAlign = 'left';
 
     canvas.toBlob(blob => {
@@ -141,8 +170,12 @@ const createNavrangPassImage = (ticket, booking) => new Promise((resolve, reject
       else reject(new Error('Could not render the pass image'));
     }, 'image/png');
   };
+  qr.onload = render;
   qr.onerror = () => reject(new Error('Could not load the pass QR code'));
+  poster.onload = render;
+  poster.onerror = () => reject(new Error('Could not load the Navrang event artwork'));
   qr.src = ticket.qrCode;
+  poster.src = '/navrang-poster.png';
 });
 
 
@@ -975,25 +1008,26 @@ export default function App() {
                 <div className="navrang-issued-grid">
                   {navrangIssuedBooking.tickets.map(ticket => (
                     <article className="navrang-pass-ticket" key={ticket.code}>
-                      <header className="navrang-pass-ticket-header">
-                        <span>AV EVENTS &amp; CO.</span>
-                        <span>NAVRANG 2026</span>
-                      </header>
-                      <div className="navrang-pass-ticket-body">
-                        <div>
-                          <span className="navrang-pass-ticket-label">ADMIT PASS {navrangIssuedBooking.quantity > 1 ? `${ticket.number} OF ${navrangIssuedBooking.quantity}` : ''}</span>
-                          <h5>Navrang<br />Dandiya Night</h5>
+                      <div className="navrang-pass-artwork">
+                        <img className="navrang-pass-artwork-image" src="/navrang-poster.png" alt="" aria-hidden="true" />
+                        <div className="navrang-pass-artwork-shade" />
+                        <div className="navrang-pass-artwork-brand">AV EVENTS &amp; CO. <span>·</span> NAVRANG 2026</div>
+                        <div className="navrang-pass-artwork-copy">
+                          <span className="navrang-pass-ticket-label">YOUR FESTIVAL PASS</span>
                           <p className="navrang-ticket-holder">{navrangIssuedBooking.name}</p>
-                          <p>{navrangIssuedBooking.passName} · ₹{navrangIssuedBooking.price.toLocaleString('en-IN')}</p>
+                          <p>{navrangIssuedBooking.passName} · PASS {ticket.number} OF {navrangIssuedBooking.quantity}</p>
+                          <span>FRIDAY, 9 OCTOBER 2026 · 5:00 PM – 10:00 PM</span>
+                          <span>{NAVRANG_EVENT.venue} · DEHRADUN</span>
                         </div>
-                        <img src={ticket.qrCode} alt={`Pass ID QR for ${ticket.code}; organizer checks manually`} />
                       </div>
-                      <div className="navrang-pass-ticket-details">
-                        <span><b>DATE</b>Friday, 9 October 2026</span>
-                        <span><b>TIME</b>{NAVRANG_EVENT.time}</span>
-                        <span><b>VENUE</b>{NAVRANG_EVENT.venue}, {NAVRANG_EVENT.address}</span>
+                      <div className={`navrang-pass-stub navrang-pass-stub-${navrangIssuedBooking.passId}`}>
+                        <span className="navrang-pass-stub-type">{navrangIssuedBooking.passName}</span>
+                        <strong className="navrang-pass-stub-price">₹{navrangIssuedBooking.price.toLocaleString('en-IN')}</strong>
+                        <span className="navrang-pass-stub-note">DRESS UP<br />DANCE OUT<br />BE YOU</span>
+                        <img src={ticket.qrCode} alt={`Unique pass ID QR for ${ticket.code}; organizer checks manually`} />
+                        <span className="navrang-pass-ticket-code">{ticket.code}</span>
+                        <span className="navrang-pass-barcode" aria-hidden="true" />
                       </div>
-                      <footer className="navrang-pass-ticket-code">PASS ID: {ticket.code}</footer>
                       <div className="navrang-issued-pass-actions">
                         <button className="btn-whatsapp navrang-whatsapp-button" type="button" onClick={() => shareNavrangPass(ticket)}>
                           Share This Pass on WhatsApp
