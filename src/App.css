@@ -505,7 +505,7 @@ input, button, select { font-family: 'Outfit', sans-serif; }
 .navrang-pass-artwork-copy p { max-width: 100%; margin: 0; color: #fff; overflow-wrap: anywhere; }
 .navrang-pass-artwork-copy .navrang-ticket-holder { font-family: 'Playfair Display', serif; font-size: clamp(14px, 2vw, 21px); font-weight: 800; }
 .navrang-pass-artwork-copy p:not(.navrang-ticket-holder) { color: #ffe3a0; font-size: 9px; font-weight: 800; }
-.navrang-pass-artwork-copy > span:last-child { color: #fff; font-size: 8px; font-weight: 700; letter-spacing: 0.5px; }
+.navrang-pass-artwork-copy > span:not(.navrang-pass-ticket-label) { color: #fff; font-size: 8px; font-weight: 700; letter-spacing: 0.35px; }
 .navrang-pass-stub { position: relative; display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: space-between; gap: 5px; padding: 10px 9px 8px; border-left: 2px dashed rgba(255,255,255,0.72); background: linear-gradient(150deg, #2f8d54, #145d3d); color: #fff; text-align: center; }
 .navrang-pass-stub-female { background: linear-gradient(150deg, #e93d83, #8b1747); }
 .navrang-pass-stub-male { background: linear-gradient(150deg, #286cb1, #123761); }

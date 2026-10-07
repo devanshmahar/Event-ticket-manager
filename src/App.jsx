@@ -106,17 +106,22 @@ const createNavrangPassImage = (ticket, booking) => new Promise((resolve, reject
     context.fillStyle = '#fff';
     context.shadowColor = 'rgba(0, 0, 0, 0.8)';
     context.shadowBlur = 12;
-    context.font = 'bold 32px Georgia';
-    context.fillText(booking.name.slice(0, 28).toUpperCase(), 450, 336, 780);
+    context.font = 'bold 28px Georgia';
+    context.fillText(booking.name.slice(0, 28).toUpperCase(), 450, 310, 780);
     context.shadowBlur = 0;
-    context.fillStyle = '#ffe19a';
-    context.font = 'bold 18px Arial';
-    context.fillText(`${booking.passName.toUpperCase()}  ·  PASS ${ticket.number} OF ${booking.quantity}`, 450, 370, 780);
     context.fillStyle = '#fff';
+    context.font = 'bold 14px Arial';
+    context.fillText(`PHONE: ${booking.phone}`, 450, 337, 780);
+    context.font = '14px Arial';
+    context.fillText(`EMAIL: ${booking.email}`, 450, 359, 780);
+    context.fillStyle = '#ffe19a';
     context.font = 'bold 16px Arial';
-    context.fillText('FRIDAY, 9 OCTOBER 2026  ·  5:00 PM – 10:00 PM', 450, 412, 820);
-    context.font = '15px Arial';
-    context.fillText('THE SHEELA’S FARM  ·  DEHRADUN', 450, 438, 820);
+    context.fillText(`${booking.passName.toUpperCase()}  ·  PASS ${ticket.number} OF ${booking.quantity}`, 450, 387, 780);
+    context.fillStyle = '#fff';
+    context.font = 'bold 14px Arial';
+    context.fillText('FRIDAY, 9 OCTOBER 2026  ·  5:00 PM – 10:00 PM', 450, 419, 820);
+    context.font = '13px Arial';
+    context.fillText('THE SHEELA’S FARM  ·  DEHRADUN', 450, 441, 820);
     context.textAlign = 'left';
 
     context.fillStyle = accent;
@@ -431,6 +436,8 @@ export default function App() {
         const ticket = { code, qrCode, number: index + 1 };
         const imageBlob = await createNavrangPassImage(ticket, {
           name,
+          phone,
+          email,
           passId: pass.id,
           passName: pass.name,
           price: pass.price,
@@ -441,6 +448,8 @@ export default function App() {
           '🎉 YOUR NAVRANG DANDIYA NIGHT PASS IS READY! 🎉',
           '━━━━━━━━━━━━━━━━━━━━',
           `👤 Pass holder: ${name}`,
+          `📞 Phone: ${phone}`,
+          `📧 Email: ${email}`,
           `🎟️ Pass: ${pass.name} · ₹${pass.price.toLocaleString('en-IN')}`,
           `🪪 Pass ID: ${code}`,
           '━━━━━━━━━━━━━━━━━━━━',
@@ -1024,6 +1033,8 @@ export default function App() {
                         <div className="navrang-pass-artwork-copy">
                           <span className="navrang-pass-ticket-label">YOUR FESTIVAL PASS</span>
                           <p className="navrang-ticket-holder">{navrangIssuedBooking.name}</p>
+                          <span>PHONE: {navrangIssuedBooking.phone}</span>
+                          <span>EMAIL: {navrangIssuedBooking.email}</span>
                           <p>{navrangIssuedBooking.passName} · PASS {ticket.number} OF {navrangIssuedBooking.quantity}</p>
                           <span>FRIDAY, 9 OCTOBER 2026 · 5:00 PM – 10:00 PM</span>
                           <span>{NAVRANG_EVENT.venue} · DEHRADUN</span>
