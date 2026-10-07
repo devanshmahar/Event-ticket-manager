@@ -262,6 +262,34 @@ input, button, select { font-family: 'Outfit', sans-serif; }
   text-decoration: none;
 }
 .navrang-fee-note { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.navrang-booking-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 148, 80, 0.24);
+  border-radius: 14px;
+  background: linear-gradient(120deg, rgba(111, 17, 32, 0.2), rgba(255, 137, 52, 0.08), rgba(97, 32, 112, 0.15));
+}
+.navrang-booking-links > span {
+  margin-right: 4px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+.navrang-booking-links a {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--gold2);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.navrang-booking-links a:hover { border-color: var(--gold); background: rgba(223,186,107,0.1); }
 .navrang-benefits { margin: 8px 0 56px; }
 .navrang-benefit-grid {
   display: grid;

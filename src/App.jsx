@@ -38,6 +38,7 @@ const NAVRANG_EVENT = {
   giftingPartnerInstagram: 'https://www.instagram.com/xoxo_patisserie/',
   bookMyShowUrl: 'https://in.bookmyshow.com/activities/navrang/ET00518074',
   sortMySceneUrl: 'https://sortmyscene.com/event/navrang-dandiya-night-oct-09-2026',
+  districtUrl: 'https://link.district.in/DSTRKT/xz9lzqtv',
   pickupUrl: 'https://maps.app.goo.gl/vjEXURYW5Zsi5LYm7?g_st=ic',
   whatsappNumber: '916396930467',
   passes: [
@@ -290,6 +291,7 @@ export default function App() {
       `📍 ${NAVRANG_EVENT.venue}, ${NAVRANG_EVENT.address}`,
       `BookMyShow: ${NAVRANG_EVENT.bookMyShowUrl}`,
       `SortMyScene: ${NAVRANG_EVENT.sortMySceneUrl}`,
+      `District: ${NAVRANG_EVENT.districtUrl}`,
       'Please confirm my pass booking. Thank you!',
     ].join('\n');
 
@@ -546,9 +548,9 @@ export default function App() {
                 <button className="btn-gold navrang-cta" type="button" onClick={() => openNavrangBooking()}>
                   Book Tickets
                 </button>
-                <button className="btn-outline navrang-cta" type="button" onClick={() => openNavrangBooking('BookMyShow')}>
+                <a className="btn-outline navrang-cta" href={NAVRANG_EVENT.bookMyShowUrl} target="_blank" rel="noreferrer">
                   Book Online
-                </button>
+                </a>
                 <button className="btn-outline navrang-cta" type="button" onClick={() => openNavrangBooking('Physical pass pickup')}>
                   Get Physical Passes
                 </button>
@@ -557,6 +559,12 @@ export default function App() {
                 </a>
               </div>
               <p className="navrang-fee-note">Online booking on BookMyShow includes an extra platform fee. Physical passes are available at the same ticket price with no platform fee.</p>
+              <div className="navrang-booking-links" aria-label="Online ticket booking websites">
+                <span>BOOK ONLINE</span>
+                <a href={NAVRANG_EVENT.bookMyShowUrl} target="_blank" rel="noreferrer">BookMyShow ↗</a>
+                <a href={NAVRANG_EVENT.sortMySceneUrl} target="_blank" rel="noreferrer">SortMyScene ↗</a>
+                <a href={NAVRANG_EVENT.districtUrl} target="_blank" rel="noreferrer">District ↗</a>
+              </div>
             </div>
           </section>
 
@@ -632,7 +640,7 @@ export default function App() {
             </div>
             <div className="navrang-pickup-links">
               <a className="btn-gold" href={NAVRANG_EVENT.pickupUrl} target="_blank" rel="noreferrer">Open Pickup Location</a>
-              <button className="navrang-sort-link navrang-platform-trigger" type="button" onClick={() => openNavrangBooking('SortMyScene')}>Book on SortMyScene ↗</button>
+              <a className="navrang-sort-link" href={NAVRANG_EVENT.sortMySceneUrl} target="_blank" rel="noreferrer">Book on SortMyScene ↗</a>
             </div>
           </section>
         </main>
@@ -652,7 +660,7 @@ export default function App() {
             <form onSubmit={handleNavrangWhatsAppBooking}>
               <fieldset className="navrang-platform-options">
                 <legend>Where would you like to book?</legend>
-                {['WhatsApp direct', 'BookMyShow', 'SortMyScene', 'Physical pass pickup'].map(method => (
+                {['WhatsApp direct', 'BookMyShow', 'SortMyScene', 'District', 'Physical pass pickup'].map(method => (
                   <label className={`navrang-platform-option ${navrangBookingMethod === method ? 'selected' : ''}`} key={method}>
                     <input
                       type="radio"
