@@ -432,6 +432,46 @@ input, button, select { font-family: 'Outfit', sans-serif; }
 .navrang-booking-form form > .navrang-form-note:last-child { margin: 14px 0 0; text-align: center; font-size: 11px; }
 .navrang-pass-icon { font-size: 28px; }
 .navrang-pass-card .strip-name { color: var(--light); }
+.navrang-payment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin: 0 0 20px;
+}
+.navrang-payment-copy { flex: 1; }
+.navrang-payment h2 {
+  margin: 14px 0 8px;
+  color: var(--gold2);
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+}
+.navrang-payment-copy > p { max-width: 620px; color: var(--muted); line-height: 1.6; }
+.navrang-upi-link,
+.navrang-payment-qr > a {
+  display: inline-flex;
+  margin-top: 14px;
+  color: var(--gold2);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.navrang-upi-id { margin-top: 12px; font-size: 13px; }
+.navrang-upi-id strong { color: var(--light); font-family: monospace; }
+.navrang-payment-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 220px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #fff;
+  text-align: center;
+}
+.navrang-payment-qr img { display: block; width: 190px; height: 190px; }
+.navrang-payment-qr p { color: #222; font-size: 12px; line-height: 1.5; }
+.navrang-payment-qr > a { color: #5d1c26; }
 .navrang-pickup {
   display: flex;
   align-items: center;
@@ -893,6 +933,8 @@ input, button, select { font-family: 'Outfit', sans-serif; }
   .navrang-modal-pass-grid { gap: 7px; }
   .navrang-modal-pass { padding: 12px 4px; }
   .navrang-modal-pass strong { font-size: 10px; }
+  .navrang-payment { flex-direction: column; align-items: flex-start; }
+  .navrang-payment-qr { align-self: center; }
   .navrang-pickup { flex-direction: column; align-items: flex-start; }
   .navrang-pickup-links { align-items: flex-start; }
   .navrang-pass-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

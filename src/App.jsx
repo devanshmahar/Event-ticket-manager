@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import QRCode from 'qrcode';
 import './App.css';
 
 const INSTAGRAM_PROFILE = 'https://www.instagram.com/co.avevents/';
@@ -41,6 +42,7 @@ const NAVRANG_EVENT = {
   districtUrl: 'https://link.district.in/DSTRKT/xz9lzqtv',
   pickupUrl: 'https://maps.app.goo.gl/vjEXURYW5Zsi5LYm7?g_st=ic',
   whatsappNumber: '916396930467',
+  upiId: 'devanshmahar22@oksbi',
   passes: [
     { id: 'female', name: 'Female Pass', price: 249, icon: '💃' },
     { id: 'male', name: 'Male Pass', price: 349, icon: '🕺' },
@@ -201,6 +203,8 @@ export default function App() {
   const [navrangForm, setNavrangForm] = useState({ name: '', phone: '', email: '' });
   const [navrangBookingOpen, setNavrangBookingOpen] = useState(false);
   const [navrangBookingMethod, setNavrangBookingMethod] = useState('WhatsApp direct');
+  const [navrangQr, setNavrangQr] = useState('');
+  const [navrangQrError, setNavrangQrError] = useState(false);
   const [menuCat, setMenuCat] = useState('All');
   const [selectedTicket, setSelectedTicket] = useState('gold');
   const [qty, setQty] = useState(1);
@@ -252,6 +256,27 @@ export default function App() {
 
   const ticket = TICKETS.find(t => t.id === selectedTicket);
   const total = ticket ? ticket.price * qty : 0;
+  const navrangUpiPayload = `upi://pay?${new URLSearchParams({
+    pa: NAVRANG_EVENT.upiId,
+    pn: 'AV Events and Co',
+    tn: 'Navrang Dandiya Night ticket',
+    cu: 'INR',
+  }).toString()}`;
+
+  useEffect(() => {
+    let cancelled = false;
+    QRCode.toDataURL(navrangUpiPayload, { width: 240, margin: 2 })
+      .then(dataUrl => {
+        if (!cancelled) setNavrangQr(dataUrl);
+      })
+      .catch(error => {
+        console.error('Failed to generate Navrang UPI QR code', error);
+        if (!cancelled) setNavrangQrError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [navrangUpiPayload]);
 
   const upiPayload = `upi://pay?${new URLSearchParams({
     pa: EVENT.upiId,
@@ -548,6 +573,21 @@ export default function App() {
                 <button className="btn-gold navrang-cta" type="button" onClick={() => openNavrangBooking()}>
                   Book Tickets
                 </button>
+                <a
+                  className="btn-outline navrang-cta"
+                  href={`https://wa.me/?text=${encodeURIComponent([
+                    `🎉 ${NAVRANG_EVENT.name}`,
+                    `📅 ${NAVRANG_EVENT.day}, ${NAVRANG_EVENT.date} | ${NAVRANG_EVENT.time}`,
+                    `📍 ${NAVRANG_EVENT.venue}, ${NAVRANG_EVENT.address}`,
+                    '🎟️ Passes: Female ₹249 | Male ₹349 | Couple ₹499',
+                    `Book tickets: ${NAVRANG_EVENT.bookMyShowUrl}`,
+                    `More event details and UPI QR: ${window.location.origin}`,
+                  ].join('\n'))}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Share on WhatsApp
+                </a>
                 <a className="btn-outline navrang-cta" href={NAVRANG_EVENT.bookMyShowUrl} target="_blank" rel="noreferrer">
                   Book Online
                 </a>
@@ -629,6 +669,28 @@ export default function App() {
                   </button>
                 </article>
               ))}
+            </div>
+          </section>
+
+          <section className="navrang-payment glass" aria-labelledby="navrang-payment-title">
+            <div className="navrang-payment-copy">
+              <span className="pill">DIRECT UPI PAYMENT</span>
+              <h2 id="navrang-payment-title">Pay for your Navrang pass</h2>
+              <p>Scan with any UPI app and enter the exact total for your pass. After paying, send your booking details to us on WhatsApp.</p>
+              <a className="navrang-upi-link" href={navrangUpiPayload}>Pay with UPI app</a>
+              <p className="navrang-upi-id">UPI ID: <strong>{NAVRANG_EVENT.upiId}</strong></p>
+            </div>
+            <div className="navrang-payment-qr">
+              {navrangQr ? (
+                <>
+                  <img src={navrangQr} alt={`UPI payment QR code for ${NAVRANG_EVENT.upiId}`} />
+                  <a href={navrangQr} download="navrang-upi-qr.png">Download QR code</a>
+                </>
+              ) : navrangQrError ? (
+                <p role="alert">QR code could not be generated. You can still pay using the UPI ID shown.</p>
+              ) : (
+                <p>Preparing your payment QR code…</p>
+              )}
             </div>
           </section>
 
