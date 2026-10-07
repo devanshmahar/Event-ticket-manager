@@ -436,17 +436,26 @@ export default function App() {
           price: pass.price,
           quantity: navrangQuantity,
         });
+        const venueMapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${NAVRANG_EVENT.venue}, ${NAVRANG_EVENT.address}`)}`;
         const shareMessage = [
-          `🎟️ Your Navrang Dandiya Night ${pass.name}`,
-          `Name: ${name}`,
-          `Pass ID: ${code}`,
-          `Friday, 9 October 2026 | ${NAVRANG_EVENT.time}`,
-          `${NAVRANG_EVENT.venue}, ${NAVRANG_EVENT.address}`,
-          'Please keep your payment confirmation for entry.',
+          '🎉 YOUR NAVRANG DANDIYA NIGHT PASS IS READY! 🎉',
+          '━━━━━━━━━━━━━━━━━━━━',
+          `👤 Pass holder: ${name}`,
+          `🎟️ Pass: ${pass.name} · ₹${pass.price.toLocaleString('en-IN')}`,
+          `🪪 Pass ID: ${code}`,
+          '━━━━━━━━━━━━━━━━━━━━',
+          '📅 Friday, 9 October 2026',
+          `⏰ ${NAVRANG_EVENT.time}`,
+          `📍 ${NAVRANG_EVENT.venue}`,
+          NAVRANG_EVENT.address,
+          `🗺️ Venue map: ${venueMapUrl}`,
+          'Show your pass and keep your payment confirmation ready at entry.',
+          'See you on the dance floor! 💃🪔',
         ].join('\n');
         return {
           ...ticket,
           imageBlob,
+          whatsappMessage: shareMessage,
           whatsappUrl: `https://wa.me/${recipientNumber}?text=${encodeURIComponent(shareMessage)}`,
         };
       }));
@@ -495,8 +504,8 @@ export default function App() {
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: 'Navrang Dandiya Night Pass',
-          text: `Navrang Dandiya Night pass for ${navrangIssuedBooking.name} · ${ticket.code}`,
+          title: `Navrang Dandiya Night Pass · ${ticket.code}`,
+          text: ticket.whatsappMessage,
         });
         return;
       }
