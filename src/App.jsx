@@ -49,10 +49,12 @@ const NAVRANG_EVENT = {
     { id: 'couple', name: 'Couple Pass', price: 499, icon: '🪔' },
   ],
   menuSections: [
-    { title: 'Cafe Favourites', icon: '🧇', items: ['Waffle', 'Pancake', 'Beverages', 'Sandwich'] },
+    { title: 'Cafe Favourites', icon: '🧇', items: ['Waffle', 'Pancake', 'Beverages', 'Unlimited Beverages', 'Sandwich', 'Water'] },
+    { title: 'Indian Favourites', icon: '🍛', items: ['Biryani', 'Rumali Roti', 'Shawarma'] },
     { title: 'Pizza & Pasta', icon: '🍕', items: ['Pizza', 'Pasta'] },
-    { title: 'Street Food & Snacks', icon: '🍽️', items: ['Dahi Kebab', 'Burger', 'Pav Bhaji', 'Vada Pav', 'Sev Puri', 'Bhel Puri', 'Chilli Potato'] },
-    { title: 'Hot Food', icon: '🍗', items: ['Chicken Momo', 'Kebab', 'Smokey Chicken', 'Chowmein', 'Chilli Chicken', 'Fried Chicken'] },
+    { title: 'Street Food & Snacks', icon: '🍽️', items: ['Chaat', 'Paneer Tikka', 'Aloo Kabab', 'Burger', 'Pav Bhaji', 'Vada Pav', 'Sev Puri', 'Bhel Puri', 'Chilli Potato', 'Dahi Kebab', 'Dandiya'] },
+    { title: 'Momos', icon: '🥟', items: ['Maggi Momos', 'Chicken Momos'] },
+    { title: 'Hot Food', icon: '🍗', items: ['Chicken', 'Smokey Chicken', 'Chilli Chicken', 'Chilly Chicken', 'Fry Chicken', 'Chaap', 'Kebab', 'Chowmein'] },
   ],
   benefits: [
     { icon: '🎧', title: 'Concert DJ Vibe', detail: 'Dance to the beats of DJ Adi', linkText: '@djadi.in', link: 'https://www.instagram.com/djadi.in/' },
