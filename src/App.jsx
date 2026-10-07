@@ -314,15 +314,11 @@ export default function App() {
       `🎫 Pass: ${pass.name}`,
       `🔢 Quantity: ${navrangQuantity}`,
       `💰 Pass total: ₹${total.toLocaleString('en-IN')}`,
-      `📲 Booking preference: ${navrangBookingMethod}`,
       '━━━━━━━━━━━━━━━━━━━━━',
       `📅 Friday, 9 October 2026 | ${NAVRANG_EVENT.time}`,
       `📍 ${NAVRANG_EVENT.venue}, ${NAVRANG_EVENT.address}`,
       `💳 UPI ID: ${NAVRANG_EVENT.upiId}`,
-      `🧾 Scan this UPI QR to pay ₹${total.toLocaleString('en-IN')}: ${qrImageUrl}`,
-      `BookMyShow: ${NAVRANG_EVENT.bookMyShowUrl}`,
-      `SortMyScene: ${NAVRANG_EVENT.sortMySceneUrl}`,
-      `District: ${NAVRANG_EVENT.districtUrl}`,
+      `🧾 Payment QR for ₹${total.toLocaleString('en-IN')}: ${qrImageUrl}`,
       'Please confirm my pass booking. Thank you!',
     ].join('\n');
 
