@@ -303,6 +303,8 @@ export default function App() {
     const pass = NAVRANG_EVENT.passes.find(item => item.id === selectedNavrangPass);
     if (!pass) return;
 
+    const total = pass.price * navrangQuantity;
+    const qrImageUrl = new URL('/navrang-upi-qr.png', window.location.origin).href;
     const message = [
       '🎟️ NAVRANG DANDIYA NIGHT – PASS ENQUIRY',
       '━━━━━━━━━━━━━━━━━━━━━',
@@ -311,11 +313,13 @@ export default function App() {
       `📧 Email: ${navrangForm.email.trim()}`,
       `🎫 Pass: ${pass.name}`,
       `🔢 Quantity: ${navrangQuantity}`,
-      `💰 Pass total: ₹${(pass.price * navrangQuantity).toLocaleString('en-IN')}`,
+      `💰 Pass total: ₹${total.toLocaleString('en-IN')}`,
       `📲 Booking preference: ${navrangBookingMethod}`,
       '━━━━━━━━━━━━━━━━━━━━━',
       `📅 Friday, 9 October 2026 | ${NAVRANG_EVENT.time}`,
       `📍 ${NAVRANG_EVENT.venue}, ${NAVRANG_EVENT.address}`,
+      `💳 UPI ID: ${NAVRANG_EVENT.upiId}`,
+      `🧾 Scan this UPI QR to pay ₹${total.toLocaleString('en-IN')}: ${qrImageUrl}`,
       `BookMyShow: ${NAVRANG_EVENT.bookMyShowUrl}`,
       `SortMyScene: ${NAVRANG_EVENT.sortMySceneUrl}`,
       `District: ${NAVRANG_EVENT.districtUrl}`,
@@ -724,17 +728,37 @@ export default function App() {
             <form onSubmit={handleNavrangWhatsAppBooking}>
               <fieldset className="navrang-platform-options">
                 <legend>Where would you like to book?</legend>
-                {['WhatsApp direct', 'BookMyShow', 'SortMyScene', 'District', 'Physical pass pickup'].map(method => (
-                  <label className={`navrang-platform-option ${navrangBookingMethod === method ? 'selected' : ''}`} key={method}>
-                    <input
-                      type="radio"
-                      name="bookingMethod"
-                      value={method}
-                      checked={navrangBookingMethod === method}
-                      onChange={() => setNavrangBookingMethod(method)}
-                    />
-                    <span>{method}</span>
-                  </label>
+                {[
+                  { method: 'WhatsApp direct' },
+                  { method: 'BookMyShow', url: NAVRANG_EVENT.bookMyShowUrl },
+                  { method: 'SortMyScene', url: NAVRANG_EVENT.sortMySceneUrl },
+                  { method: 'District', url: NAVRANG_EVENT.districtUrl },
+                  { method: 'Physical pass pickup', url: NAVRANG_EVENT.pickupUrl },
+                ].map(({ method, url }) => (
+                  <div className={`navrang-platform-option ${navrangBookingMethod === method ? 'selected' : ''}`} key={method}>
+                    <label className="navrang-platform-choice">
+                      <input
+                        type="radio"
+                        name="bookingMethod"
+                        value={method}
+                        checked={navrangBookingMethod === method}
+                        onChange={() => setNavrangBookingMethod(method)}
+                      />
+                      <span>{method}</span>
+                    </label>
+                    {url && (
+                      <a
+                        className="navrang-platform-link"
+                        href={url}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={method === 'Physical pass pickup' ? 'Open physical pass pickup location' : `Open ${method} booking page`}
+                        onClick={() => setNavrangBookingMethod(method)}
+                      >
+                        Open ↗
+                      </a>
+                    )}
+                  </div>
                 ))}
               </fieldset>
               <div className="navrang-modal-pass-grid" role="group" aria-label="Select pass type">
